@@ -1,0 +1,10 @@
+# roles/requirements.yml is checked automatically by Ansible Tower/AWX (now AAP/Ansible Automation Platform)
+# see: https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html#ansible-galaxy-support
+collections:
+  - community.general
+roles:
+  - name: junoinnovations.juno_k3s
+    version: main
+    src: https://github.com/juno-fx/juno_k3s.git
+
+

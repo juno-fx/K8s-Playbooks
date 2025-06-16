@@ -1,0 +1,19 @@
+---
+juno_k3s:
+  children:
+    juno_k3s_controlplane:
+    juno_k3s_workers:
+juno_k3s_controlplane:
+  hosts:
+    juno-prod01cp01.example.com
+    juno-prod01cp02.example.com
+    juno-prod01cp03.example.com
+  vars:
+    k3s_control_plane_node: true
+
+
+juno_k3s_workers:
+  hosts:
+    juno-prod01worker01.example.com
+    juno-prod01worker02.example.com
+    juno-prod01worker03.example.com

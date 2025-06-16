@@ -1,0 +1,6 @@
+# ToDo: freeze reqs
+ansible
+requests
+pyyaml
+oci
+python-dateutil
