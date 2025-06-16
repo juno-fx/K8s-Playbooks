@@ -4,6 +4,7 @@ build-ee:
 	docker build . -t juno-ee:unstable
 
 ansible-shell: build-ee
+	# ToDo: correct permission handling
 	docker run -v ${HOME}:/root -v ${PWD}:/runner -it --rm juno-ee:unstable
 
 
