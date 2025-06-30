@@ -1,11 +1,79 @@
 ---
 - name: Ensure the correct state of all nodes in the cluster
-  hosts: all
+  hosts: juno_k3s
   vars:
+    # your git credentials
+    juno_git_user: "oauth2"
+    juno_git_password: "password"
+    # https://github.com/juno-fx/Juno-Bootstrap
+    juno_bootstrap_git_url: "http://your-git-host.example/git/Juno-Bootstrap.git"
+    # http://github.com/juno-fx/genesis-Deployment/
+    juno_genesis_deployment_git_url: "http://your-git-host.example/git/Genesis-Deployment.git"
+    argo_install_manifest_url: "file://{{ playbook_dir }}/airgap_files/argo-install.yaml"
     k3s_install_script_url: "file://{{ playbook_dir }}/airgap_files/install.sh"
     k3s_binary_url: "file://{{ playbook_dir }}/airgap_files/k3s"
+    # k3s_images_url points to the k3s-provided tarball of necessary images
+    # For fully airgapped installs,we recommend pointing the cluster at your local registry via k3s_registries_yaml
     k3s_images_url: "file://{{ playbook_dir }}/airgap_files/k3s-airgap-images-amd64.tar.zst"
+    # For more details on using a private registry, eg. using authentication, see:
+    # https://docs.k3s.io/installation/private-registry
+    #
+    # An example of how you can leverage it - the below is templated directly into your registries.yml
+    #
+    # k3s_registries_yaml: |
+    #   mirrors:
+    #     docker.io:
+    #       endpoint:
+    #         - "http://{{ proxy_address }}:5000"
+    #     quay.io:
+    #       endpoint:
+    #         - "http://{{ proxy_address }}:5001"
+    #     ghcr.io:
+    #       endpoint:
+    #         - "http://{{ proxy_address }}:5002"
     k3s_airgap_install: true
+    juno_bootstrap_chart_values:
+      genesis:
+        repoURL: "http://{{ proxy_address }}/git/Genesis-Deployment.git"
+      #  repoURL: "http://{{ proxy_address }}/git/Genesis-Deployment.git"
+      #### Genesis Helm repo branch to deploy  (REQUIRED)
+      #  version: "v1.1"
+      #  config:
+      #    ### Container registry containing the Juno images  (REQUIRED)
+      #    registry:
+      #    ### Image Pull Secret (Uncomment if using)
+      #    # image_pull_secret:
+      #    ### hostname of the server: my-genesis.example.com  (REQUIRED)
+      #    host:
+      #    ### Juno License Key  (REQUIRED)
+      #    license_key:
+      #    ### Environment Variables
+      #    env:
+      #    # You must have either Google or AWS Cognito configured.
+      #    # Uncomment one of the following (REQUIRED)
+      #    ### Google OAuth (Uncomment If using)
+      #    #  GOOGLE_CLIENT_ID:
+      #    #  GOOGLE_CLIENT_SECRET:
+      #    ### AWS Cognito (Uncomment If using)
+      #    #  COGNITO_CLIENT_ID:
+      #    #  COGNITO_CLIENT_SECRET:
+      #    #  COGNITO_ISSUER:
+      #    ### LDAP (Uncomment if using | BETA)
+      #    #  LDAP_URI:
+      #    #  LDAP_BIND_DN:
+      #    #  LDAP_BIND_PASSWORD:
+      #    #  LDAP_SEARCH_BASE:
+      #    #  LDAP_EMAIL_ATTRIBUTE:
+      #    #  LDAP_USERNAME_ATTRIBUTE:
+      #    # Owner Configuration
+      #    titan:
+      #      # Username of the owner (REQUIRED)
+      #      owner:
+      #      # POSIX UID of the owner (REQUIRED)
+      #      uid:
+      #      # Email of the owner. This should be the email used by either
+      #      # of the above configured authentication services. (REQUIRED)
+      #      email:
   tasks:
     - name: Check if the join token file exists
       ansible.builtin.stat:
