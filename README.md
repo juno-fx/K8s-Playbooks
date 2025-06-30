@@ -105,6 +105,11 @@ For a full list, refer to [Juno-Bootstrap values](https://github.com/juno-fx/Jun
 All configuration is passed in as variables. You can see them in the playbook (`playbooks/deploy/juno-k3s-airgap.yml`) under `vars`.
 The example `juno_bootstrap_chart_values` vars show what you will need to adjust to get Juno running. We highlighted the fields  you must define with "(REQUIRED)"
 
+Another important configuration is pointing the deployment at your local container image registry. You can either:
+- explicitly adjust Juno-Bootstrap values to use your registry and imagePullSecrets. The values enable you to adjust each individual component as well, such as GPU-Operator or Nginx
+- use the k3s_registries_yaml var to map docker.io/junoinnovations to a path in your local registry.
+
+
 You will also need to mark your nodes as workstation/headless/service nodes in the inventory. By default all control plane hosts you define are "service nodes", while all workers are workstations.
 
 If you have multiple environments with distinct variables, consider defining them [in your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inheriting-variable-values-group-variables-for-groups-of-groups).
