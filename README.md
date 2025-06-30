@@ -46,7 +46,10 @@ Moreover, for airgapped installations:
   - container tooling access (`docker`,`podman` or similar) - it is no longer optional for airgapped installs
 
 
-There are additional requirements for airgapped installations - details on those will be published soon.
+There are additional requirements for airgapped installations - those are the resources you need to make available on your network to get up&running.
+
+You can find them in the [Orion Documentation](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/air-gapped/)
+A list of necessary images is listed under the [Image Guide](https://juno-fx.github.io/Orion-Documentation/installation/pre-reqs/images/)
 
 
 ## Forking this repo
@@ -64,6 +67,21 @@ Those exist for most major&small cloud providers and virtualisation platforms - 
 
 ## Online installation
 
+### Online installation - Configuring the playbook
+
+For the online installation, you only need to adjust:
+- the Juno-Bootstrap values. Those control settings such as the URL you use to access the deployments.
+  Those are controlled by `juno_bootstrap_chart_values` in `playbooks/deploy/juno-k3s.yml`, where you can also find a practical example. 
+
+  We highlighted the fields  you must define with "(REQUIRED)"
+- Mark your nodes as workstation/headless/service nodes in the inventory. By default all control plane hosts you define are "service nodes", while all workers are workstations.
+
+If you'd like to get more in-depth details on those, make sure to check out:
+- the [Internet-enabled Installation Guide](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/on-prem-installation/
+- the [Juno-Bootstrap repository](https://github.com/juno-fx/Juno-Bootstrap)
+
+### Online installation - Running the playbook
+
 The steps below assume both your target hosts to deploy Juno onto and your local machine both have internet access.
 
 1. Get your fork of the repo onto the machine you'll execute Ansible from (eg. your laptop or jump host)
@@ -76,17 +94,29 @@ or alternatively, setup a python venv with all the dependencies: `make venv/bin/
 `<username>` is the user you are ssh-ing to on the target host.
 When using password-protected sudo, you can also pass the `-K` flag to get prompted for the credential.
 
+
 ## Airgapped installation
 
+### Airgapped installation - Configuring the playbook
 
-Documentation on generic airgapped installtions is coming soon.
-The below outlines only how to run the playbooks and will be updated with prerequisites shortly.
+Before you run the playbook, you need to pass it details about your environment.
+For a full list, refer to [Juno-Bootstrap values](https://github.com/juno-fx/Juno-Bootstrap) and the explanation in the  [airgap install guide](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/air-gapped/) mentioned earlier.
 
+All configuration is passed in as variables. You can see them in the playbook (`playbooks/deploy/juno-k3s-airgap.yml`) under `vars`.
+The example `juno_bootstrap_chart_values` vars show what you will need to adjust to get Juno running. We highlighted the fields  you must define with "(REQUIRED)"
+
+You will also need to mark your nodes as workstation/headless/service nodes in the inventory. By default all control plane hosts you define are "service nodes", while all workers are workstations.
+
+If you have multiple environments with distinct variables, consider defining them [in your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inheriting-variable-values-group-variables-for-groups-of-groups).
+The in-inventory vars are optional and only pointed out to make it easier for you to handle more complex use cases.
+
+### Airgapped installation - Running the playbook
+
+Once you've satisfied the [Prerequisites](#Prerequisites) and configured your deployment across the playbooks/inventories, you can run the playbook following the below:
 
 Before performing the steps, replace the download URLs in your fork with ones relevant to your environment. You can find them in `playbooks/deploy/juno-k3s-airgap.yml`
 For detailed information on the download URL variables, see the [role README.md](https://github.com/juno-fx/juno_k3s)
 
-If you have multiple environments with distinct variables, consider defining them [in your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inheriting-variable-values-group-variables-for-groups-of-groups)
 
 Once that is ready, you can go ahead and deploy:
 
