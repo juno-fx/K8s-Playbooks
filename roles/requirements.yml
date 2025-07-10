@@ -7,4 +7,3 @@ roles:
     version: main
     src: https://github.com/juno-fx/juno_k3s.git
 
-
