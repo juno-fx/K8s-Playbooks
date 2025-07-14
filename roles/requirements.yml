@@ -6,4 +6,3 @@ roles:
   - name: juno-fx.juno_k3s
     version: main
     src: https://github.com/juno-fx/juno_k3s.git
-
