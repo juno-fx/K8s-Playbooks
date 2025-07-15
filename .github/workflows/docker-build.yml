@@ -6,7 +6,8 @@ on:
       - .github/**
       - README.md
       - Makefile
-  workflow_dispatch:
+  repository_dispatch:
+    types: [juno_k3s_main_merge]
 
 jobs:
   build:
