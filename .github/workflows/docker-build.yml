@@ -2,10 +2,12 @@ name: Build the ansible-ee image
 on:
   push:
     paths-ignore:
-      - .github/**
       - .gitignore
+      - .github/**
       - README.md
       - Makefile
+  repository_dispatch:
+    types: [juno_k3s_main_merge]
 
 jobs:
   build:
@@ -26,8 +28,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Fetch the latest sha for juno_k3s
+        id: commit_shas
+        run: |
+          # saves time - dont wanna install jq just for this and sed is unreliable
+          # stlib > requests in this case
+          echo "JUNO_K3S_SHORT_SHA=$(python3 -c "import urllib.request, json; print(json.load(urllib.request.urlopen('https://api.github.com/repos/juno-fx/juno_k3s/commits/main'))['sha'][:8])")" >> $GITHUB_OUTPUT
+          echo "REPO_SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: "${{ github.ref_name == 'main' }}"
-          tags: junoinnovations/ansible-ee:${{ (github.ref_name == 'main' && 'stable') }}
+          tags: |
+            junoinnovations/ansible-ee:main
+            junoinnovations/ansible-ee:main-${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}-${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}
