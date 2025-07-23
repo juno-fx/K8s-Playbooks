@@ -146,3 +146,14 @@ While secret handling will differ from organisation to organisation, we can reco
 We strongly recommended you avoid storing plaintext secrets in git.
 That opens you up to much risk if your repo gets leaked or any of your developer machines is compromised.
 
+
+
+## "oneclick" installer
+
+This repo also contains our oneclick installer.
+Detailed documentation is coming soon for it.
+
+### "oneclick" installer - Attributions&Licensing
+
+We repackage parts of the k3s project, which is distributed under the [Apache licnese](https://github.com/k3s-io/k3s/blob/master/LICENSE)
+On top of sharing the license, we'd also like to ackowneldge the great work the project has done in making Kubernetes very accessible - it's thanks to their hard work we can provide you with an installer for a simple, out-of-the-box distribution.
