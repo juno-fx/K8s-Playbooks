@@ -8,5 +8,4 @@ venv/
 juno-oneclick.tar.gz
 oneclick-oci
 oneclick-bundle
-.hack/dockerc
 
