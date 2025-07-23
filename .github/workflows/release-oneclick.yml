@@ -14,9 +14,11 @@ on:
     types: [juno_k3s_main_merge]
 
 jobs:
-  build:
+  release:
     runs-on:
       - STANDARD-RUNNER
+    permissions:
+      contents: write
     steps:
       - name: Clone Source Code
         uses: actions/checkout@v4
