@@ -1,7 +1,7 @@
 .PHONY: build-ee ansible-shell
 
 build-ee:
-	docker build . -t junoinnovations/ansible-ee:unstable-local
+	docker build . -t junoinnovations/ansible-ee:unstable-local --target k8s-playbooks
 
 ansible-shell: build-ee
 	docker run -v ${HOME}/.ssh:/root/.ssh:ro -v ${PWD}:/runner:ro -it --rm junoinnovations/ansible-ee:unstable-local
@@ -13,3 +13,13 @@ venv/bin/activate:
 
 clean:
 	rm -rf venv
+
+build-oneclick: .hack/dockerc
+	sudo rm -rf oneclick-bundle oneclick-oci
+	rm juno-oneclick.tar.gz || true
+	docker build . -t junoinnovations/oneclick:latest --target oneclick
+	skopeo copy docker-daemon:junoinnovations/oneclick:latest oci:oneclick-oci:latest
+	umoci unpack --rootless --image oneclick-oci:latest oneclick-bundle
+	sudo mv oneclick-bundle/rootfs oneclick-bundle/juno-oneclickfs
+	sudo tar -czf juno-oneclick.tar.gz -C oneclick-bundle/ juno-oneclickfs
+	sudo chown $(USER) juno-oneclick.tar.gz
