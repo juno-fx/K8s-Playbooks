@@ -1,1 +1,11 @@
 venv/
+
+.vscode
+.vagrant
+
+.ansible
+
+juno-oneclick.tar.gz
+oneclick-oci
+oneclick-bundle
+

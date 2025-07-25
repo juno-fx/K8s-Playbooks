@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# chrooted "oneclick" install wrapper for Juno
+#
+# It takes in a single argument - a Juno-Bootstrap values file (https://github.com/juno-fx/Juno-Bootstrap)
+#
+# usage: /tmp/juno_oneclickfs/juno_oneclick.install <path to Juno-Bootstrap values>
+
+set -e
+
+CHROOT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+values_file=${1}
+
+if [ -z "${values_file}" ]; then
+    echo "You must pass a path to a Juno-Bootstrap values file as an argument, eg. /tmp/juno_oneclickfs/juno_oneclick.install /tmp/juno_bootstrap_chart_values.yaml"
+    exit 1
+fi
+
+cp "${values_file}" ${CHROOT_DIR}/tmp/juno_bootstrap_chart_values.yaml
+
+mount --bind /dev/ "${CHROOT_DIR}/dev/"
+mount -t proc /proc ${CHROOT_DIR}/proc 
+chroot "${CHROOT_DIR}" /oneclick/oneclick.sh
+
+umount -l -f "${CHROOT_DIR}/dev"
+umount -l -f "${CHROOT_DIR}/proc"

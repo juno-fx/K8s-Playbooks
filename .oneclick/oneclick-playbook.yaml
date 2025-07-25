@@ -1,0 +1,21 @@
+---
+- name: Bootstrap a single control plane node
+  hosts: chroot_targets
+  connection: chroot
+  vars:
+    k3s_install_script_url: "file://{{ playbook_dir }}/install_files/k3s_install.sh"
+    k3s_binary_url: "file://{{ playbook_dir }}/install_files/k3s"
+    k3s_bootstrap_node: true
+    k3s_control_plane_node: true
+  tasks:
+    - name: Copy in the chart values file
+      ansible.builtin.copy:
+        src: /tmp/juno_bootstrap_chart_values.yaml
+        dest: /tmp/juno_bootstrap_chart_values.yaml
+        mode: '0644'
+    - name: Load the chart values from the file
+      ansible.builtin.set_fact:
+        juno_bootstrap_chart_values: "{{ lookup('file', '/tmp/juno_bootstrap_chart_values.yaml') | from_yaml }}"
+    - name: Bootstrap the cluster
+      ansible.builtin.include_role:
+        name: "juno-fx.juno_k3s"
