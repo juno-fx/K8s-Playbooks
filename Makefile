@@ -14,7 +14,7 @@ venv/bin/activate:
 clean:
 	rm -rf venv
 
-build-oneclick: .hack/dockerc
+build-oneclick:
 	sudo rm -rf oneclick-bundle oneclick-oci
 	rm juno-oneclick.tar.gz || true
 	docker build . -t junoinnovations/oneclick:latest --target oneclick
