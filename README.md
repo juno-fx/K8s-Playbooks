@@ -4,7 +4,7 @@ This repository will provide you an easy, out-of-the-box Ansible setup you can u
 To learn more about how we transform high-performance workstation workflows, visit [Juno Innovations](https://www.juno-innovations.com/)
 
 Reading through below sections will provide you with a step-by-step process of getting up&running.
-You can also deploy our workstation platform on existing, out-of-the-box Kubernetes providers by visiting our [Orion Deployment Documentation](https://juno-fx.github.io/Orion-Documentation/installation/prod/nodes/eks/)
+You can also deploy our workstation platform on existing, out-of-the-box Kubernetes providers by visiting our [Orion Deployment Documentation](https://juno-fx.github.io/Orion-Documentation/installation/deployments/)
 
 The steps below focus on self-managed deployments.
 
@@ -48,7 +48,7 @@ Moreover, for airgapped installations:
 
 There are additional requirements for airgapped installations - those are the resources you need to make available on your network to get up&running.
 
-You can find them in the [Orion Documentation](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/air-gapped/)
+You can find them in the [Orion Air-Gapped Install Documentation](https://juno-fx.github.io/Orion-Documentation/installation/special/air-gapped/)
 A list of necessary images is listed under the [Image Guide](https://juno-fx.github.io/Orion-Documentation/installation/pre-reqs/images/)
 
 
@@ -77,7 +77,7 @@ For the online installation, you only need to adjust:
 - Mark your nodes as workstation/headless/service nodes in the inventory. By default all control plane hosts you define are "service nodes", while all workers are workstations.
 
 If you'd like to get more in-depth details on those, make sure to check out:
-- the [Internet-enabled Installation Guide](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/on-prem-installation/
+- the [Internet-enabled Installation Guide](https://juno-fx.github.io/Orion-Documentation/installation/juno/)
 - the [Juno-Bootstrap repository](https://github.com/juno-fx/Juno-Bootstrap)
 
 ### Online installation - Running the playbook
@@ -100,7 +100,7 @@ When using password-protected sudo, you can also pass the `-K` flag to get promp
 ### Airgapped installation - Configuring the playbook
 
 Before you run the playbook, you need to pass it details about your environment.
-For a full list, refer to [Juno-Bootstrap values](https://github.com/juno-fx/Juno-Bootstrap) and the explanation in the  [airgap install guide](https://juno-fx.github.io/Orion-Documentation/installation/prod/installation/air-gapped/) mentioned earlier.
+For a full list, refer to [Juno-Bootstrap values](https://github.com/juno-fx/Juno-Bootstrap) and the explanation in the  [airgap install guide](https://juno-fx.github.io/Orion-Documentation/installation/special/air-gapped/) mentioned earlier.
 
 All configuration is passed in as variables. You can see them in the playbook (`playbooks/deploy/juno-k3s-airgap.yml`) under `vars`.
 The example `juno_bootstrap_chart_values` vars show what you will need to adjust to get Juno running. We highlighted the fields  you must define with "(REQUIRED)"
