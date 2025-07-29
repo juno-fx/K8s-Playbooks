@@ -2,6 +2,8 @@ name: Lint
 on:
   push:
   pull_request:
+  repository_dispatch:
+    types: [orion_documentation_update]
 jobs:
   lint:
     name: Lint
