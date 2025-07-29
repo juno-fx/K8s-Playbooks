@@ -23,3 +23,6 @@ build-oneclick:
 	sudo mv oneclick-bundle/rootfs oneclick-bundle/juno-oneclickfs
 	sudo tar -czf juno-oneclick.tar.gz -C oneclick-bundle/ juno-oneclickfs
 	sudo chown $(USER) juno-oneclick.tar.gz
+
+lint:
+	@docker run --rm -v "${PWD}:/mnt" koalaman/shellcheck:stable .oneclick/juno-oneclick.install

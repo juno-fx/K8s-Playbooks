@@ -41,7 +41,7 @@ To get running, you must have:
 - either python3.12+ or container tooling (`docker`,`podman`, etc.) on the machine you will perform the deployment from.
 
 Moreover, for airgapped installations:
-  - you must have the latest `docker.io/junoinnovations/ansible-ee:stable` image ingested into your airgapped machine
+  - you must have the latest `docker.io/junoinnovations/ansible-ee:main` image ingested into your airgapped machine
     - we recommend doing it via your internal image registry (ECR/Harbor/etc.)
   - container tooling access (`docker`,`podman` or similar) - it is no longer optional for airgapped installs
 

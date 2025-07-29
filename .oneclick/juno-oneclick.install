@@ -17,10 +17,10 @@ if [ -z "${values_file}" ]; then
     exit 1
 fi
 
-cp "${values_file}" ${CHROOT_DIR}/tmp/juno_bootstrap_chart_values.yaml
+cp "${values_file}" "${CHROOT_DIR}/tmp/juno_bootstrap_chart_values.yaml"
 
 mount --bind /dev/ "${CHROOT_DIR}/dev/"
-mount -t proc /proc ${CHROOT_DIR}/proc 
+mount -t proc /proc "${CHROOT_DIR}/proc"
 chroot "${CHROOT_DIR}" /oneclick/oneclick.sh
 
 umount -l -f "${CHROOT_DIR}/dev"
