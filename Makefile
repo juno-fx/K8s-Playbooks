@@ -17,13 +17,15 @@ clean:
 build-oneclick:
 	sudo rm -rf oneclick-bundle oneclick-oci
 	rm juno-oneclick.tar.gz || true
-	docker build . -t junoinnovations/oneclick:latest --target oneclick
-	skopeo copy docker-daemon:junoinnovations/oneclick:latest oci:oneclick-oci:latest
+	docker build . -t junoinnovations/oneclick:latest --target oneclick --load
+	# this just trusts the build we just performed - it's ok, since it's local-only.
+	skopeo --insecure-policy copy docker-daemon:junoinnovations/oneclick:latest oci:oneclick-oci:latest
 	umoci unpack --rootless --image oneclick-oci:latest oneclick-bundle
 	sudo mv oneclick-bundle/rootfs oneclick-bundle/juno-oneclickfs
 	sudo tar -czf juno-oneclick.tar.gz -C oneclick-bundle/ juno-oneclickfs
 	sudo chown $(USER) juno-oneclick.tar.gz
+	docker image rm junoinnovations/oneclick:latest
 
 lint:
-	@docker run --rm -v "${PWD}:/mnt" koalaman/shellcheck:stable .oneclick/juno-oneclick.install .hack/lint-urls.sh
+	@shellcheck .oneclick/juno-oneclick.install
 	.hack/lint-urls.sh "${PWD}/README.md"
