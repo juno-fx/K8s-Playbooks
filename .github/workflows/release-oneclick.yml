@@ -8,8 +8,6 @@ on:
       - README.md
       - CONTRIBUTING.md
       - Makefile
-    branches:
-      - main
   repository_dispatch:
     types: [juno_k3s_main_merge]
 
@@ -45,9 +43,10 @@ jobs:
       - name: Build the oneclick installer
         run: |
           [ -f juno-oneclick.tar.gz ] && rm juno-oneclick.tar.gz
-          make build-oneclick
+          devbox run make build-oneclick
 
       - name: Make a rolling release
+        if: github.ref == 'refs/heads/main' || github.event_name == 'repository_dispatch'
         id: release
         uses: softprops/action-gh-release@v1
         with:
