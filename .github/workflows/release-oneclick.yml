@@ -50,10 +50,12 @@ jobs:
         id: release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}"
-          name: "Juno Oneclick Installer - ${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}"
+          tag_name: "${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}_${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}"
+          name: "Juno Oneclick Installer - ${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}_${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}"
           files: juno-oneclick.tar.gz
           body: |
-            This release tracks commit [${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}](
+            This release was built with:
+             - commit [${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}](https://github.com/juno-fx/juno_k3s/tree/${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}) of [juno-fx/juno_k3s](https://github.com/juno-fx/juno_k3s)
+             - commit [${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}](https://github.com/juno-fx/K8s-Playbooks/tree/${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}) of [juno-fx/K8s-Playbooks](https://github.com/juno-fx/K8s-Playbooks)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
