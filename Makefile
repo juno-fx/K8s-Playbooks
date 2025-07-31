@@ -25,4 +25,5 @@ build-oneclick:
 	sudo chown $(USER) juno-oneclick.tar.gz
 
 lint:
-	@docker run --rm -v "${PWD}:/mnt" koalaman/shellcheck:stable .oneclick/juno-oneclick.install
+	@docker run --rm -v "${PWD}:/mnt" koalaman/shellcheck:stable .oneclick/juno-oneclick.install .hack/lint-urls.sh
+	.hack/lint-urls.sh "${PWD}/README.md"
