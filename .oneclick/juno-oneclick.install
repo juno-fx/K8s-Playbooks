@@ -8,6 +8,8 @@
 
 set -e
 
+export LC_ALL=C.utf8
+
 CHROOT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 values_file=${1}
