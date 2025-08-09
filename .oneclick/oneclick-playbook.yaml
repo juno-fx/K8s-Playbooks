@@ -19,3 +19,36 @@
     - name: Bootstrap the cluster
       ansible.builtin.include_role:
         name: "juno-fx.juno_k3s"
+
+    - name: Awaiting genesis
+      ansible.builtin.debug:
+        msg: >
+          Waiting for genesis to be reachable at:
+          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}
+          This can take a while, as images are getting ingested.
+    - name: Waiting for genesis to be reachable over http(s) - this can take a little while the images are ingested.
+      ansible.builtin.uri:
+        url: "{{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}"
+        # ssl won't exist at this point - currently it can be added post-bootstrap
+        validate_certs: false
+        status_code: 200
+      register: genesis_health_check
+      until: genesis_health_check.status == 200
+      failed_when: false
+      retries: 20
+      no_log: true
+      delay: 15
+
+    - name: If genesis is not reachable, give a clear error
+      ansible.builtin.fail:
+        msg: >
+          Genesis is not reachable at:
+          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}
+          Please check your configuration. Is genesis.host a resolvable hostname or IP address?
+          Request details: {{ genesis_health_check }}.
+      when: genesis_health_check.status != 200
+
+    - name: Display the the genesis URL on health check success
+      when: genesis_health_check.status == 200
+      ansible.builtin.debug:
+        msg: "Genesis is reachable at {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}"
