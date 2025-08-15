@@ -9,7 +9,9 @@ on:
       - CONTRIBUTING.md
       - Makefile
   repository_dispatch:
-    types: [juno_k3s_main_merge]
+    types:
+      - juno_k3s_main_merge
+      - juno_bootstrap_main_merge
 
 jobs:
   release:
@@ -38,6 +40,7 @@ jobs:
           # saves time - dont wanna install jq just for this and sed is unreliable
           # stlib > requests in this case
           echo "JUNO_K3S_SHORT_SHA=$(python3 -c "import urllib.request, json; print(json.load(urllib.request.urlopen('https://api.github.com/repos/juno-fx/juno_k3s/commits/main'))['sha'][:8])")" >> $GITHUB_OUTPUT
+          echo "JUNO_BOOTSTRAP_SHORT_SHA=$(python3 -c "import urllib.request, json; print(json.load(urllib.request.urlopen('https://api.github.com/repos/juno-fx/Juno-Bootstrap/commits/main'))['sha'][:8])")" >> $GITHUB_OUTPUT
           echo "REPO_SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build the oneclick installer
@@ -50,12 +53,13 @@ jobs:
         id: release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}_${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}"
+          tag_name: "${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}_${{ steps.commit_shas.outputs.JUNO_BOOTSTRAP_SHORT_SHA }}_${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}"
           name: "Juno Oneclick Installer - ${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}_${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}"
           files: juno-oneclick.tar.gz
           body: |
             This release was built with:
              - commit [${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}](https://github.com/juno-fx/juno_k3s/tree/${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}) of [juno-fx/juno_k3s](https://github.com/juno-fx/juno_k3s)
+             - commit [${{ steps.commit_shas.outputs.JUNO_BOOTSTRAP_SHORT_SHA }}](https://github.com/juno-fx/Juno-Bootstrap/tree/${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}) of [juno-fx/Juno-Bootstrap](https://github.com/juno-fx/Juno-Bootstrap)
              - commit [${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}](https://github.com/juno-fx/K8s-Playbooks/tree/${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}) of [juno-fx/K8s-Playbooks](https://github.com/juno-fx/K8s-Playbooks)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
