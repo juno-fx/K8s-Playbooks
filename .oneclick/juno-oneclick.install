@@ -7,6 +7,15 @@
 # usage: /tmp/juno_oneclickfs/juno_oneclick.install <path to Juno-Bootstrap values>
 
 set -e
+trap 'cleanup' EXIT ERR INT TERM
+
+cleanup() {
+    for mnt in "${CHROOT_DIR}/dev" "${CHROOT_DIR}/proc"; do
+        if mountpoint -q "$mnt"; then
+            umount -l -f "$mnt" || true
+        fi
+    done
+}
 
 export LC_ALL=C.utf8
 
@@ -21,9 +30,13 @@ fi
 
 cp "${values_file}" "${CHROOT_DIR}/tmp/juno_bootstrap_chart_values.yaml"
 
-mount --bind /dev/ "${CHROOT_DIR}/dev/"
-mount -t proc /proc "${CHROOT_DIR}/proc"
+# bind mounting twice would kill any PTYs, breaking basic terminal functionality (eg. can't sudo)
+if ! mountpoint -q "${CHROOT_DIR}/dev"; then
+    mount --bind /dev/ "${CHROOT_DIR}/dev/"
+fi
+if ! mountpoint -q "${CHROOT_DIR}/proc"; then
+    mount -t proc /proc "${CHROOT_DIR}/proc"
+fi
 chroot "${CHROOT_DIR}" /oneclick/oneclick.sh
-
 umount -l -f "${CHROOT_DIR}/dev"
 umount -l -f "${CHROOT_DIR}/proc"
