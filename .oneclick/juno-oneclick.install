@@ -6,6 +6,8 @@
 #
 # usage: /tmp/juno_oneclickfs/juno_oneclick.install <path to Juno-Bootstrap values>
 
+export PATH="${PATH}:/usr/local/bin"
+
 set -e
 trap 'cleanup' EXIT ERR INT TERM
 
