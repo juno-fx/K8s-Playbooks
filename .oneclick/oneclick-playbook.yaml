@@ -3,8 +3,9 @@
   hosts: chroot_targets
   connection: chroot
   vars:
-    k3s_install_script_url: "file://{{ playbook_dir }}/install_files/k3s_install.sh"
-    k3s_binary_url: "file://{{ playbook_dir }}/install_files/k3s"
+    k3s_install_script_url: "file:///install_files/k3s_install.sh"
+    k3s_binary_url: "file:///install_files/k3s"
+    juno_bootstrap_url: "file:///install_files/Juno-Bootstrap"
     k3s_bootstrap_node: true
     k3s_control_plane_node: true
   tasks:
@@ -16,6 +17,11 @@
     - name: Load the chart values from the file
       ansible.builtin.set_fact:
         juno_bootstrap_chart_values: "{{ lookup('file', '/tmp/juno_bootstrap_chart_values.yaml') | from_yaml }}"
+    - name: If _oneclick_registries is set,populate k3s_registries_yaml with it 
+      ansible.builtin.set_fact:
+        k3s_registries_yaml: "{{ juno_bootstrap_chart_values._oneclick_registries }}"
+      when: juno_bootstrap_chart_values._oneclick_registries is defined
+
     - name: Bootstrap the cluster
       ansible.builtin.include_role:
         name: "juno-fx.juno_k3s"
