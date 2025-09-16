@@ -1,6 +1,7 @@
 name: Build the ansible-ee image
 on:
   push:
+    workflow_dispatch:
     paths-ignore:
       - .gitignore
       - .github/**
