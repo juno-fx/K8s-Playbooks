@@ -8,4 +8,11 @@ if [ ! -f /tmp/juno_bootstrap_chart_values.yaml ]; then
   exit 1
 fi
 
-ansible-playbook -i /oneclick/inventory /oneclick/oneclick-playbook.yaml
+extra_vars=${1}
+extra_vars_full_args=""
+if [ "${extra_vars}" ]; then
+    extra_vars_full_args=--extra-vars "$extra_vars"
+fi
+
+
+echo ansible-playbook -i /oneclick/inventory /oneclick/oneclick-playbook.yaml "$extra_vars_full_args"
