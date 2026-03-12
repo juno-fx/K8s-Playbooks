@@ -24,6 +24,7 @@ export LC_ALL=C.utf8
 CHROOT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 values_file=${1}
+extra_vars=${2}
 
 if [ -z "${values_file}" ]; then
     echo "You must pass a path to a Juno-Bootstrap values file as an argument, eg. /tmp/juno_oneclickfs/juno_oneclick.install /tmp/juno_bootstrap_chart_values.yaml"
@@ -39,6 +40,6 @@ fi
 if ! mountpoint -q "${CHROOT_DIR}/proc"; then
     mount -t proc /proc "${CHROOT_DIR}/proc"
 fi
-chroot "${CHROOT_DIR}" /oneclick/oneclick.sh
+chroot "${CHROOT_DIR}" /oneclick/oneclick.sh "$extra_vars"
 umount -l -f "${CHROOT_DIR}/dev"
 umount -l -f "${CHROOT_DIR}/proc"
