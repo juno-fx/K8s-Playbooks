@@ -13,7 +13,7 @@ RUN ansible-galaxy collection install -r /tmp/requirements.yml
 RUN mkdir /install_files
 
 RUN curl -L https://get.k3s.io -o /install_files/k3s_install.sh
-RUN curl -L https://github.com/k3s-io/k3s/releases/download/v1.33.1%2Bk3s1/k3s -o /install_files/k3s
+RUN curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s -o /install_files/k3s
 RUN git clone https://github.com/juno-fx/Juno-Bootstrap.git /install_files/Juno-Bootstrap
 
 # Ansible EE brings in a ton of collections by default that are not necessary.
