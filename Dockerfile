@@ -1,4 +1,5 @@
 FROM quay.io/ansible/awx-ee:latest AS k8s-playbooks-build
+ARG TARGETARCH
 
 USER root
 
@@ -11,9 +12,14 @@ RUN ansible-galaxy install -r /tmp/requirements.yml
 RUN ansible-galaxy collection install -r /tmp/requirements.yml
 
 RUN mkdir /install_files
-
 RUN curl -L https://get.k3s.io -o /install_files/k3s_install.sh
-RUN curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s -o /install_files/k3s
+RUN set -eux; \
+    if [ "$TARGETARCH" = "arm64" ]; then \
+      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s-arm64 -o /install_files/k3s; \
+    else \
+      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s -o /install_files/k3s; \
+    fi
+
 RUN git clone https://github.com/juno-fx/Juno-Bootstrap.git /install_files/Juno-Bootstrap
 
 # Ansible EE brings in a ton of collections by default that are not necessary.
@@ -22,7 +28,7 @@ RUN rm -rf /usr/local/lib/python3.11/site-packages/azure
 RUN rm -rf /usr/local/lib/python3.11/site-packages/openstack
 RUN rm -rf /usr/local/lib/python3.11/site-packages/msgraph # interesting...
 
-FROM scratch as k8s-playbooks
+FROM scratch AS k8s-playbooks
 
 COPY --from=k8s-playbooks-build / /
 
