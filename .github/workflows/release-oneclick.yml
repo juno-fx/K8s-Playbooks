@@ -27,6 +27,9 @@ jobs:
             group: ARM-RUNNER
             platform: linux/arm64
             asset_arch: arm64
+    concurrency:
+      group: release-${{ github.sha }}
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
