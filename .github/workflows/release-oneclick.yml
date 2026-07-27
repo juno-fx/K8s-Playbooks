@@ -12,11 +12,21 @@ on:
     types:
       - juno_k3s_main_merge
       - juno_bootstrap_main_merge
-
 jobs:
   release:
     runs-on:
-      - STANDARD-RUNNER
+      - ${{ matrix.runner.group }}
+    strategy:
+      matrix:
+        runner:
+          - arch: x64
+            group: STANDARD-RUNNER
+            platform: linux/amd64
+            asset_arch: amd64
+          - arch: arm64
+            group: ARM-RUNNER
+            platform: linux/arm64
+            asset_arch: arm64
     permissions:
       contents: write
     steps:
@@ -30,7 +40,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Fetch the latest sha for juno_k3s
         id: commit_shas
         run: |
@@ -39,12 +48,14 @@ jobs:
           echo "JUNO_K3S_SHORT_SHA=$(python3 -c "import urllib.request, json; print(json.load(urllib.request.urlopen('https://api.github.com/repos/juno-fx/juno_k3s/commits/main'))['sha'][:8])")" >> $GITHUB_OUTPUT
           echo "JUNO_BOOTSTRAP_SHORT_SHA=$(python3 -c "import urllib.request, json; print(json.load(urllib.request.urlopen('https://api.github.com/repos/juno-fx/Juno-Bootstrap/commits/main'))['sha'][:8])")" >> $GITHUB_OUTPUT
           echo "REPO_SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build the oneclick installer
+        env:
+          DOCKER_PLATFORM: ${{ matrix.runner.platform }}
         run: |
           [ -f juno-oneclick.tar.gz ] && rm juno-oneclick.tar.gz
           devbox run make build-oneclick
-
+      - name: Rename tarball for architecture
+        run: mv juno-oneclick.tar.gz juno-oneclick-${{ matrix.runner.asset_arch }}.tar.gz
       - name: Make a rolling release
         if: github.ref == 'refs/heads/main' || github.event_name == 'repository_dispatch'
         id: release
@@ -52,7 +63,7 @@ jobs:
         with:
           tag_name: "${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}_${{ steps.commit_shas.outputs.JUNO_BOOTSTRAP_SHORT_SHA }}_${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}"
           name: "Juno Oneclick Installer - ${{ steps.commit_shas.outputs.REPO_SHORT_SHA }}_${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}"
-          files: juno-oneclick.tar.gz
+          files: juno-oneclick-${{ matrix.runner.asset_arch }}.tar.gz
           body: |
             This release was built with:
              - commit [${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}](https://github.com/juno-fx/juno_k3s/tree/${{ steps.commit_shas.outputs.JUNO_K3S_SHORT_SHA }}) of [juno-fx/juno_k3s](https://github.com/juno-fx/juno_k3s)
