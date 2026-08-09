@@ -4,5 +4,5 @@ collections:
   - community.general
 roles:
   - name: juno-fx.juno_k3s
-    version: main
+    version: 298-bug-node-provisioning
     src: https://github.com/juno-fx/juno_k3s.git
