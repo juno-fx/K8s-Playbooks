@@ -15,9 +15,9 @@ RUN mkdir /install_files
 RUN curl -L https://get.k3s.io -o /install_files/k3s_install.sh
 RUN set -eux; \
     if [ "$TARGETARCH" = "arm64" ]; then \
-      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s-arm64 -o /install_files/k3s; \
+      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.4%2Bk3s1/k3s-arm64 -o /install_files/k3s; \
     else \
-      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.1%2Bk3s1/k3s -o /install_files/k3s; \
+      curl -L https://github.com/k3s-io/k3s/releases/download/v1.36.4%2Bk3s1/k3s -o /install_files/k3s; \
     fi
 
 RUN git clone https://github.com/juno-fx/Juno-Bootstrap.git /install_files/Juno-Bootstrap
