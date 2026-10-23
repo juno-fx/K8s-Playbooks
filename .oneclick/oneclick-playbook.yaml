@@ -30,11 +30,12 @@
       ansible.builtin.debug:
         msg: >
           Waiting for genesis to be reachable at:
-          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}
+          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}
           This can take a while, as images are getting ingested.
+
     - name: Waiting for genesis to be reachable over http(s) - this can take a little while the images are ingested.
       ansible.builtin.uri:
-        url: "{{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}"
+        url: "{{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}"
         # ssl won't exist at this point - currently it can be added post-bootstrap
         validate_certs: false
         status_code: 200
@@ -49,7 +50,7 @@
       ansible.builtin.fail:
         msg: >
           Genesis is not reachable at:
-          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}
+          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}
           Please check your configuration. Is genesis.host a resolvable hostname or IP address?
           Request details: {{ genesis_health_check }}.
       when: genesis_health_check.status != 200
@@ -57,4 +58,4 @@
     - name: Display the the genesis URL on health check success
       when: genesis_health_check.status == 200
       ansible.builtin.debug:
-        msg: "Genesis is reachable at {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host }}"
+        msg: "Genesis is reachable at {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1')}}"
