@@ -14,10 +14,27 @@
         src: /tmp/juno_bootstrap_chart_values.yaml
         dest: /tmp/juno_bootstrap_chart_values.yaml
         mode: '0644'
+
     - name: Load the chart values from the file
       ansible.builtin.set_fact:
         juno_bootstrap_chart_values: "{{ lookup('file', '/tmp/juno_bootstrap_chart_values.yaml') | from_yaml }}"
-    - name: If _oneclick_registries is set,populate k3s_registries_yaml with it 
+
+    - name: Check the genesis config is present
+      ansible.builtin.assert:
+        that:
+          - juno_bootstrap_chart_values.genesis.config.http_scheme is defined
+        fail_msg: "genesis.config.http_scheme is missing from the chart values file"
+
+    - name: Build the genesis connection facts
+      ansible.builtin.set_fact:
+        genesis_scheme: "{{ juno_bootstrap_chart_values.genesis.config.http_scheme }}"
+        genesis_host: "{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}"
+
+    - name: Build the genesis URL
+      ansible.builtin.set_fact:
+        genesis_url: "{{ genesis_scheme }}://{{ genesis_host }}"
+
+    - name: If _oneclick_registries is set, populate k3s_registries_yaml with it
       ansible.builtin.set_fact:
         k3s_registries_yaml: "{{ juno_bootstrap_chart_values._oneclick_registries }}"
       when: juno_bootstrap_chart_values._oneclick_registries is defined
@@ -29,33 +46,31 @@
     - name: Awaiting genesis
       ansible.builtin.debug:
         msg: >
-          Waiting for genesis to be reachable at:
-          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}
+          Waiting for genesis to be reachable at {{ genesis_url }}.
           This can take a while, as images are getting ingested.
 
-    - name: Waiting for genesis to be reachable over http(s) - this can take a little while the images are ingested.
+    - name: Waiting for genesis to be reachable over http(s)
       ansible.builtin.uri:
-        url: "{{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}"
-        # ssl won't exist at this point - currently it can be added post-bootstrap
+        url: "{{ genesis_scheme }}://127.0.0.1"
+        headers:
+          Host: "{{ genesis_host }}"
         validate_certs: false
         status_code: 200
       register: genesis_health_check
       until: genesis_health_check.status == 200
-      failed_when: false
       retries: 20
-      no_log: true
       delay: 15
+      failed_when: false
 
     - name: If genesis is not reachable, give a clear error
       ansible.builtin.fail:
         msg: >
-          Genesis is not reachable at:
-          {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1') }}
+          Genesis is not reachable at {{ genesis_url }}.
           Please check your configuration. Is genesis.host a resolvable hostname or IP address?
           Request details: {{ genesis_health_check }}.
       when: genesis_health_check.status != 200
 
-    - name: Display the the genesis URL on health check success
-      when: genesis_health_check.status == 200
+    - name: Display the genesis URL on health check success
       ansible.builtin.debug:
-        msg: "Genesis is reachable at {{ juno_bootstrap_chart_values.genesis.config.http_scheme }}://{{ juno_bootstrap_chart_values.genesis.config.host | default('127.0.0.1')}}"
+        msg: "Genesis is reachable at {{ genesis_url }}"
+      when: genesis_health_check.status == 200
